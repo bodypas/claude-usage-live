@@ -1,9 +1,8 @@
-import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
 import type { Snapshot } from '../types'
 
-const snapshot = atom({ plugin: 'usage-live', key: 'snapshot' } as const, null)
+const SNAPSHOT = { plugin: 'usage-live', key: 'snapshot' } as const
 const NAMES: Record<string, string> = { five_hour: '5-hour', seven_day: 'Weekly' }
 
 // 0% is green, 50% is yellow, 100% is red.
@@ -27,20 +26,27 @@ const left = (resetsAt: string | undefined, now: number) => {
   return `resets in ${d > 0 ? `${d}d ${h}h` : h > 0 ? `${h}h ${m % 60}m` : `${m}m`}`
 }
 
-const refresh = async ($: EngineInterface) => {
+async function refresh($: EngineInterface) {
   const { context, rateLimits, cost } = await $.session.usage()
   const snap: Snapshot = { ...context, limits: rateLimits, usd: cost?.usd }
-  await update($, snapshot, () => snap)
+  await $.state.set(SNAPSHOT, snap)
 }
 
 export const register: Register = on => {
-  on('session.start', async ($, e, next) => (await refresh($), next(e)))
-  on('session.measure', async ($, e, next) => (await refresh($), next(e)))
+  on('session.start', async ($, e, next) => {
+    await refresh($)
+    return next(e)
+  })
+
+  on('session.measure', async ($, e, next) => {
+    await refresh($)
+    return next(e)
+  })
 
   on('ui.render', { component: 'PromptHint' }, async ($, e, next) => {
     const engineLine = await next(e)
-    const snap = await read($, snapshot)
-    if (snap === null) return engineLine
+    const { value: snap } = await $.state.get(SNAPSHOT)
+    if (!snap) return engineLine
 
     const { Box, Text } = $.ui.resolve(e)
     const now = await $.clock.now()
