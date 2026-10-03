@@ -1,0 +1,9 @@
+{
+  "name": "usage-live",
+  "version": "0.7.0",
+  "description": "Colored line under the prompt with context fill, 5-hour and weekly limits, and session cost",
+  "types": "./types/index.d.ts",
+  "author": {
+    "name": "Bogdan Pascari"
+  }
+}
