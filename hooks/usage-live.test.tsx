@@ -1,4 +1,4 @@
-import { expect, mock, test } from 'claude-code/testing'
+import { expect, test } from 'claude-code/testing'
 
 import { heat } from './register'
 
@@ -22,12 +22,12 @@ test('heat goes from green at 0% to red at 100%', () => {
 for (const surface of ['terminal', 'desktop'] as const) {
   test(`prompt hint line shows full words and colors on ${surface}`, async ($, on) => {
     on('session.usage', () => ({ value: USAGE }))
-    on('session.measure', (_$, e) => ({ changed: e.changed }))
+    on('session.measure', ($, e) => ({ changed: e.changed }))
     on('ui.render', ($, e) => {
       const { Text } = $.ui.resolve(e)
       return <Text dimColor>? for shortcuts</Text>
     })
-    mock.clock(on, { now: Date.parse('2026-10-03T11:46:00Z') })
+    on('clock.now', () => ({ value: Date.parse('2026-10-03T11:46:00Z') }))
 
     await $.session.measure({
       context: USAGE.context,
