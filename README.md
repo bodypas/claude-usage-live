@@ -15,6 +15,14 @@ Install it from the `bodypas-mods` marketplace:
 /plugin install usage-live@bodypas-mods
 ```
 
+## Privacy
+
+The plugin collects no data and sends no data. It reads the usage figures of your own session from Claude Code (context fill, rate-limit windows, session cost) and draws them in your terminal. It makes no network requests and writes no files.
+
+## Support
+
+Open an issue at https://github.com/bodypas/claude-usage-live/issues.
+
 ## Develop
 
 ```
