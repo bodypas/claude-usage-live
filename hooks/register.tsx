@@ -9,26 +9,35 @@ const NAMES: Record<string, string> = { five_hour: '5-hour', seven_day: 'Weekly'
 export const heat = (percent: number) => {
   const p = Math.min(100, Math.max(0, percent)) / 100
   const hex = (n: number) => Math.round(Math.min(255, n)).toString(16).padStart(2, '0')
-  return `#${hex(510 * p)}${hex(510 * (1 - p))}00`
+  return '#' + hex(510 * p) + hex(510 * (1 - p)) + '00'
 }
 
 // A thin bar: the used part is a heavy line, the rest a light dim line.
 const BAR = 10
 const filled = (percent: number) => Math.min(BAR, Math.max(0, Math.round((percent / 100) * BAR)))
 
-const tokens = (n: number) =>
+const size = (n: number) =>
   n >= 1e6 ? `${Math.round(n / 1e5) / 10}M` : `${Math.round(n / 1e3)}k`
 
 const left = (resetsAt: string | undefined, now: number) => {
   if (!resetsAt) return ''
   const m = Math.max(0, Math.round((Date.parse(resetsAt) - now) / 60000))
-  const [d, h] = [Math.floor(m / 1440), Math.floor((m % 1440) / 60)]
-  return `resets in ${d > 0 ? `${d}d ${h}h` : h > 0 ? `${h}h ${m % 60}m` : `${m}m`}`
+  const days = Math.floor(m / 1440)
+  const hours = Math.floor((m % 1440) / 60)
+  if (days > 0) return `resets in ${days}d ${hours}h`
+  if (hours > 0) return `resets in ${hours}h ${m % 60}m`
+  return `resets in ${m}m`
 }
 
 async function refresh($: EngineInterface) {
   const { context, rateLimits, cost } = await $.session.usage()
-  const snap: Snapshot = { ...context, limits: rateLimits, usd: cost?.usd }
+  const snap: Snapshot = {
+    used: context.tokens,
+    window: context.window,
+    percent: context.percent,
+    limits: rateLimits,
+    usd: cost?.usd,
+  }
   await $.state.set(SNAPSHOT, snap)
 }
 
@@ -60,7 +69,7 @@ export const register: Register = on => {
         <Text dimColor>{'  '}{detail}</Text>
       </Text>
     )
-    const used = snap.tokens === undefined ? '–' : tokens(snap.tokens)
+    const used = snap.used === undefined ? '–' : size(snap.used)
 
     return (
       <Box flexDirection="column">
@@ -68,7 +77,7 @@ export const register: Register = on => {
         <Box>
           <Text wrap="truncate-end">
             <Text dimColor>{'└ '}</Text>
-            {gauge('Context', snap.percent ?? 0, `${used}/${tokens(snap.window)}`)}
+            {gauge('Context', snap.percent ?? 0, `${used}/${size(snap.window)}`)}
             {snap.limits.map(l => (
               <Text>
                 <Text dimColor>{'   │   '}</Text>
