@@ -1,6 +1,6 @@
 # usage-live
 
-A Claude Code plugin. It draws one line under the prompt with the context fill, the 5-hour and weekly limits, and the session cost. Each bar changes from green at 0% to red at 100%.
+A Claude Code plugin. It draws one line under the prompt with the context fill, the 5-hour and weekly limits, and the session cost. Each bar changes from green at 0% to red at 100%. The 5-hour and weekly percents have a `~` mark: they come from the last API response of your session and can be up to 1 point different from the Usage tab.
 
 ![The usage-live line under the Claude Code prompt](docs/preview.svg)
 

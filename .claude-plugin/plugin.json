@@ -1,6 +1,6 @@
 {
   "name": "usage-live",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "description": "Colored line under the prompt with context fill, 5-hour and weekly limits, and session cost",
   "types": "./types/index.d.ts",
   "author": {

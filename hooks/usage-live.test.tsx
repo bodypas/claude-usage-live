@@ -48,13 +48,13 @@ for (const surface of ['terminal', 'desktop'] as const) {
     const line = await ui.find({ type: 'Text', text: /^└ Context {2}/ })
     expect(line?.text).toBe(
       '└ Context  ━───────── 11%  107k/1M' +
-        '   │   5-hour  ━━──────── 24%  resets in 2h 14m' +
-        '   │   Weekly  ━━━━━━──── 58%  resets in 3d 21h' +
+        '   │   5-hour  ━━──────── ~24%  resets in 2h 14m' +
+        '   │   Weekly  ━━━━━━──── ~58%  resets in 3d 21h' +
         '   │   Cost $1.42',
     )
     expect(line?.props).toMatchObject({ wrap: 'truncate-end' })
     expect((await ui.find({ type: 'Text', text: /^━{6}$/ }))?.props).toMatchObject({ color: heat(58) })
-    expect((await ui.find({ type: 'Text', text: /^ 24%$/ }))?.props).toMatchObject({ color: heat(24) })
+    expect((await ui.find({ type: 'Text', text: /^ ~24%$/ }))?.props).toMatchObject({ color: heat(24) })
     expect(await ui.find({ type: 'Text', text: /^─+$/ })).toBeDefined()
     expect(await ui.find({ text: '? for shortcuts' })).toBeDefined()
   })

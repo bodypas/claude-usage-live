@@ -59,13 +59,19 @@ export const register: Register = on => {
 
     const { Box, Text } = $.ui.resolve(e)
     const now = await $.clock.now()
-    const gauge = (name: string, percent: number, detail: string) => (
+    // A rate-limit percent comes from this session's last API response and can
+    // differ from the Usage tab, so it is marked as approximate.
+    const gauge = (name: string, percent: number, detail: string, mark = '') => (
       <Text>
         {name}
         {'  '}
         <Text color={heat(percent)}>{'━'.repeat(filled(percent))}</Text>
         <Text dimColor>{'─'.repeat(BAR - filled(percent))}</Text>
-        <Text color={heat(percent)}> {percent}%</Text>
+        <Text color={heat(percent)}>
+          {' '}
+          {mark}
+          {percent}%
+        </Text>
         <Text dimColor>{'  '}{detail}</Text>
       </Text>
     )
@@ -81,7 +87,7 @@ export const register: Register = on => {
             {snap.limits.map(l => (
               <Text>
                 <Text dimColor>{'   │   '}</Text>
-                {gauge(NAMES[l.kind] ?? l.kind, l.percentUsed, left(l.resetsAt, now))}
+                {gauge(NAMES[l.kind] ?? l.kind, l.percentUsed, left(l.resetsAt, now), '~')}
               </Text>
             ))}
             {snap.usd !== undefined && (
